@@ -4,8 +4,7 @@
  * TEMPORARY STUB
  * ---------------
  * Real implementation used `nodemailer` to send emails.
- * For now we just log and pretend everything worked,
- * so the build doesn't need the `nodemailer` package.
+ * For now we just log and pretend everything worked.
  */
 
 export type NewListingEmailPayload = {
@@ -16,7 +15,6 @@ export type NewListingEmailPayload = {
 export async function sendNewListingEmail(
   payload: NewListingEmailPayload
 ): Promise<void> {
-  // You can log to Vercel logs for debugging if needed
   console.log("sendNewListingEmail stub called with payload:", payload);
-  // Do nothing – no real email is sent in this stub.
+  // No real email sending in this stub.
 }
