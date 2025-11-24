@@ -3,8 +3,8 @@
 /**
  * TEMPORARY STUB
  * ---------------
- * Real implementation used `web-push` to send browser notifications.
- * For now we just log and return, so the build doesn't need `web-push`.
+ * Real implementation used `web-push` for browser notifications.
+ * For now we just log and do nothing.
  */
 
 export type NewListingPushPayload = {
@@ -17,5 +17,5 @@ export async function sendNewListingPush(
   payload: NewListingPushPayload
 ): Promise<void> {
   console.log("sendNewListingPush stub called with payload:", payload);
-  // No real push notification in this stub.
+  // No push notification in this stub.
 }
