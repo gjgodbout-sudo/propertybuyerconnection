@@ -1,5 +1,20 @@
-import { NextResponse } from 'next/server'
-import { prisma } from '@/lib/db'
-import { getCurrentAgentId } from '@/lib/auth'
-import { parse } from 'csv-parse/sync'
-export async function POST(req:Request){ const formData=await req.formData(); const file=formData.get('file') as File | null; if(!file) return NextResponse.json({error:'missing_file'},{status:400}); const agent_id=getCurrentAgentId(); const buf=Buffer.from(await file.arrayBuffer()); const rows:any[]=parse(buf,{columns:true,skip_empty_lines:true}); let created=0; for(const r of rows){ try{ await prisma.listing.create({ data:{ agent_id, title:r.title||'Untitled', description:r.description||null, price:r.price?String(r.price):null, currency:r.currency||null, property_type:r.property_type||'house', beds:r.beds?Number(r.beds):null, baths:r.baths?Number(r.baths):null, building_size_sqft:r.building_size_sqft?Number(r.building_size_sqft):null, lot_size_sqft:r.lot_size_sqft?Number(r.lot_size_sqft):null, status:r.status||'for_sale', listing_url:r.listing_url, address_line1:r.address_line1||null, address_line2:r.address_line2||null, city:r.city||null, state_province:r.state_province||null, postal_zip:r.postal_zip||null, country:(r.country==='CA'?'CA':'US'), lat:r.lat?String(r.lat) as any:null, lng:r.lng?String(r.lng) as any:null, published:r.published==='true'||r.published===true, published_at:(r.published==='true'||r.published===true)?new Date():null } }); created++ }catch(e){ console.error('Row failed', r) } } return NextResponse.json({ created }) }
+// app/api/listings/import/route.ts
+import { NextResponse } from "next/server";
+
+/**
+ * TEMPORARY STUB
+ * ----------------
+ * This endpoint used to import listings from a CSV using `csv-parse/sync`.
+ * For the first deployment, we disable it so the build doesn't need that package.
+ */
+
+export async function POST(req: Request) {
+  return NextResponse.json(
+    {
+      ok: false,
+      message:
+        "CSV import is not enabled on this deployment yet. Please contact support if you need this feature.",
+    },
+    { status: 501 }
+  );
+}
