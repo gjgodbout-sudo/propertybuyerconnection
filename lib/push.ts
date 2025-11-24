@@ -1,11 +1,21 @@
-import webpush from 'web-push'
-function ensureConfigured(){
-  const pub=process.env.VAPID_PUBLIC_KEY, priv=process.env.VAPID_PRIVATE_KEY, email=process.env.VAPID_CONTACT||'mailto:admin@propertybuyerconnection.com'
-  if(!pub||!priv) throw new Error('VAPID keys missing')
-  webpush.setVapidDetails(email, pub, priv)
-}
-export async function sendPush(subscription:any, payload:any){
-  ensureConfigured()
-  const data=typeof payload==='string'?payload:JSON.stringify(payload)
-  await webpush.sendNotification(subscription, data)
+// lib/push.ts
+
+/**
+ * TEMPORARY STUB
+ * ---------------
+ * Real implementation used `web-push` to send browser notifications.
+ * For now we just log and return, so the build doesn't need `web-push`.
+ */
+
+export type NewListingPushPayload = {
+  title?: string;
+  body?: string;
+  [key: string]: any;
+};
+
+export async function sendNewListingPush(
+  payload: NewListingPushPayload
+): Promise<void> {
+  console.log("sendNewListingPush stub called with payload:", payload);
+  // No real push notification in this stub.
 }
