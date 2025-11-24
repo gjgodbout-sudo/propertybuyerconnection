@@ -4,8 +4,7 @@ import { NextResponse } from "next/server";
 /**
  * TEMPORARY STUB
  * ----------------
- * This endpoint used to import listings from a CSV using `csv-parse/sync`.
- * For the first deployment, we disable it so the build doesn't need that package.
+ * CSV import is disabled in this deployment so we don't need `csv-parse/sync`.
  */
 
 export async function POST(req: Request) {
