@@ -1,15 +1,10 @@
-'use client'
-import { useEffect, useRef, useState } from 'react'
-function slugify(s:string){return (s||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')}
-export default function MapSearchPage(){
-  const mapContainer=useRef<HTMLDivElement|null>(null); const mapRef=useRef<any>(null); const drawRef=useRef<any>(null)
-  const [results,setResults]=useState<any[]>([]); const [status,setStatus]=useState('')
-  const token=process.env.NEXT_PUBLIC_MAPBOX_TOKEN||''
-  useEffect(()=>{ let map:any; (async()=>{ const mapboxgl=(await import('mapbox-gl')).default; mapboxgl.accessToken=token; map=new mapboxgl.Map({container:mapContainer.current!,style:'mapbox://styles/mapbox/streets-v11',center:[-79.3832,43.6532],zoom:9}); const Draw=(await import('@mapbox/mapbox-gl-draw')).default; const draw=new Draw({displayControlsDefault:false,controls:{polygon:true,trash:true}}); drawRef.current=draw; map.addControl(draw,'top-left'); map.addControl(new mapboxgl.NavigationControl(),'top-right'); const circleBtn=document.createElement('button'); circleBtn.className='mapbox-gl-draw_ctrl-draw-btn'; circleBtn.title='Draw circle at center'; circleBtn.textContent='◯'; circleBtn.onclick=async()=>{ const center=map.getCenter(); const t=await import('@turf/turf'); const poly=t.circle([center.lng,center.lat],2,{steps:64,units:'kilometers'}); draw.add(poly as any) }; const ctrl=document.createElement('div'); ctrl.className='mapboxgl-ctrl mapboxgl-ctrl-group'; ctrl.appendChild(circleBtn); map.addControl({onAdd:()=>ctrl,onRemove:()=>{}} as any,'top-left'); mapRef.current=map })(); return ()=>{ mapRef.current?.remove() } },[token])
-  async function searchShapes(){ try{ const coll=drawRef.current.getAll(); if(!coll||!coll.features.length){ setStatus('Draw an area first.'); return } setStatus('Searching…'); const res=await fetch('/api/search/shape',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({geojson:coll,limit:200})}); const data=await res.json(); if(!res.ok){ setStatus(data.error||'Error'); return } setResults(data.items||[]); setStatus(`${(data.items||[]).length} results`); const map=mapRef.current; (map.__markers||[]).forEach((m:any)=>m.remove()); map.__markers=[]; const mapboxgl=(await import('mapbox-gl')).default; for(const l of data.items||[]){ if(!l.lng||!l.lat) continue; const el=document.createElement('div'); el.style.width='10px'; el.style.height='10px'; el.style.borderRadius='9999px'; el.style.background='#111'; const marker=new mapboxgl.Marker(el).setLngLat([Number(l.lng),Number(l.lat)]).addTo(map); map.__markers.push(marker) } }catch{ setStatus('Error') } }
-  async function useMyLocation(){ if(!navigator.geolocation) return; navigator.geolocation.getCurrentPosition(pos=>{ mapRef.current?.flyTo({center:[pos.coords.longitude,pos.coords.latitude],zoom:12}) }) }
-  return(<div className='grid lg:grid-cols-5 gap-4'>
-    <div className='lg:col-span-3'><div className='card p-0 overflow-hidden'><div ref={mapContainer} style={{height:'70vh'}} /></div><div className='mt-3 flex gap-2'><button className='btn' onClick={useMyLocation}>Use my location</button><button className='btn-primary' onClick={searchShapes}>Search in drawn area</button><span className='text-sm text-gray-600 self-center'>{status}</span></div></div>
-    <div className='lg:col-span-2'><div className='card'><h2 className='text-lg font-semibold mb-2'>Results</h2><div className='grid gap-3 max-h-[70vh] overflow-auto pr-2'>{results.map((l:any)=>(<div key={l.id} className='border rounded-xl p-3'><div className='font-medium'>{l.title}</div><div className='text-sm text-gray-600'>{l.city ?? ''}{l.city?', ':''}{l.state_province ?? ''} • {l.property_type}</div><div className='text-sm text-gray-600'>{l.price?`$${Number(l.price).toLocaleString()}`:'—'} {l.currency||''}</div><div className='mt-2 flex gap-2'><a className='btn' href={l.listing_url} target='_blank' rel='noopener noreferrer'>Full Listing</a><a className='btn' href={`/lead/${l.id}`}>Contact</a><a className='btn' href={`/listing/${slugify(`${l.title||''}-${l.city||''}-${l.state_province||''}`)}-${l.id}`}>Details</a></div></div>))}{results.length===0&&<div className='text-sm text-gray-600'>No results yet. Draw an area and click search.</div>}</div></div></div>
-  </div>)
+"use client";
+
+export default function MapPage() {
+  return (
+    <main style={{ padding: "2rem" }}>
+      <h1>Map Search (Coming Soon)</h1>
+      <p>The interactive map search will be available shortly.</p>
+    </main>
+  );
 }
