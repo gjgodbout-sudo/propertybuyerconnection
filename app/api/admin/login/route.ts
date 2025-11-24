@@ -1,0 +1,2 @@
+import { NextResponse } from 'next/server'
+export async function GET(req:Request){ const {searchParams}=new URL(req.url); const key=searchParams.get('key'); const secret=process.env.ADMIN_SECRET; if(!secret) return NextResponse.json({error:'ADMIN_SECRET not set'},{status:500}); if(!key||key!==secret) return NextResponse.json({error:'invalid_key'},{status:401}); const res=NextResponse.redirect(new URL('/admin/agents', req.url)); res.cookies.set('admin_key', key, { httpOnly:true, sameSite:'lax', path:'/' }); return res }

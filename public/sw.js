@@ -1,0 +1,3 @@
+self.addEventListener('install', e=>self.skipWaiting()); self.addEventListener('activate', e=>self.clients.claim());
+self.addEventListener('push', e=>{ let d={}; try{d=e.data.json()}catch{d={title:'PropertyBuyerConnection',body:e.data?.text()||'Update'}}; const t=d.title||'PropertyBuyerConnection', body=d.body||'You have an update', url=d.url||'/'; e.waitUntil(self.registration.showNotification(t,{body,data:{url}})); });
+self.addEventListener('notificationclick', e=>{ e.notification.close(); const url=e.notification.data?.url||'/'; e.waitUntil(clients.matchAll({type:'window'}).then(list=>{ for(const c of list){ if('focus' in c) return c.focus() } if(clients.openWindow) return clients.openWindow(url) })) });

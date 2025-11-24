@@ -1,0 +1,24 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model TestRecord {
+  id        Int      @id @default(autoincrement())
+  name      String
+  createdAt DateTime @default(now())
+}
+
+model Lead {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String
+  phone     String?
+  message   String?
+  source    String?   // e.g. "homepage", "property-page", etc.
+  createdAt DateTime @default(now())
+}
