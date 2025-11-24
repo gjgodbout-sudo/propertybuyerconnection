@@ -1,6 +1,32 @@
-import { NextResponse } from 'next/server'
-import { prisma } from '@/lib/db'
-import { findMatchingSavedSearches } from '@/lib/matchSavedSearches'
-import { sendEmail } from '@/lib/mailer'
-import { sendPush } from '@/lib/push'
-export async function POST(req:Request){ try{ const { listing_id }=await req.json(); if(!listing_id) return NextResponse.json({error:'missing_listing_id'},{status:400}); const listing=await prisma.listing.findUnique({ where:{ id: listing_id } }); if(!listing||!listing.published) return NextResponse.json({error:'not_published'},{status:400}); const matches=await findMatchingSavedSearches(listing_id); for(const ss of matches){ const subject=`New property match: ${listing.title}`; const url=listing.listing_url; const html=`<p>We found a new property that matches your search.</p><p><strong>${listing.title}</strong><br/>${listing.city ?? ''} ${listing.state_province ?? ''}<br/><a href="${url}">View full listing</a></p>`; if(ss.notification_pref==='daily') continue; if(ss.buyer_email){ try{ await sendEmail(ss.buyer_email, subject, html) }catch(e){} } if(ss.buyer_push_json){ try{ await sendPush(ss.buyer_push_json, { title: subject, url }) }catch(e){} } } return NextResponse.json({ sent_to: matches.length }) }catch(e:any){ console.error(e); return NextResponse.json({error:'server_error',detail:e.message},{status:500}) } }
+// app/api/jobs/notify-new-listing/route.ts
+import { NextResponse } from "next/server";
+import { sendNewListingEmail } from "@/lib/mailer";
+import { sendNewListingPush } from "@/lib/push";
+
+/**
+ * TEMPORARY IMPLEMENTATION
+ * -------------------------
+ * This endpoint receives a payload about a new listing
+ * and calls stubbed email + push helpers.
+ */
+
+export async function POST(req: Request) {
+  try {
+    const payload = await req.json();
+
+    // Fire-and-forget style – but these are stubs right now.
+    await sendNewListingEmail(payload);
+    await sendNewListingPush(payload);
+
+    return NextResponse.json({ ok: true });
+  } catch (err: any) {
+    console.error("notify-new-listing error:", err);
+    return NextResponse.json(
+      {
+        ok: false,
+        message: "Failed to process new listing notification.",
+      },
+      { status: 500 }
+    );
+  }
+}
