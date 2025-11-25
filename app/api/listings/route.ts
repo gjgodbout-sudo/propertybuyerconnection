@@ -7,7 +7,8 @@ export async function POST(req:Request){
   try{
     const body=await req.json()
     const agent_id=getCurrentAgentId()
-    const agent = await prisma.agent.findUnique({ where: { id: agent_id } })
+    const db = prisma as any
+    const agent = await db.agent.findUnique({ where: { id: agent_id } })
     if(!body.title||!body.listing_url){ return NextResponse.json({error:'title and listing_url are required'},{status:400}) }
     if(!/^https?:\/\//i.test(body.listing_url)){ return NextResponse.json({error:'listing_url must be http(s)'},{status:400}) }
     const {lat,lng}=await geocodeAddress({address_line1:body.address_line1,city:body.city,state_province:body.state_province,postal_zip:body.postal_zip,country:body.country})
