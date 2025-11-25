@@ -1,4 +1,34 @@
-import { prisma } from '@/lib/db'
-import { cookies } from 'next/headers'
-function isAuthorized(){ const jar=cookies(); const key=jar.get('admin_key')?.value; const secret=process.env.ADMIN_SECRET; return !!secret && key===secret }
-export default async function AdminListingsPage(){ const ok=isAuthorized(); if(!ok) return (<div className='card'><h1 className='text-2xl font-semibold mb-2'>Admin Access Required</h1><p className='text-gray-700'>Login via <code>/api/admin/login?key=YOUR_SECRET</code></p></div>); const listings=await prisma.listing.findMany({ orderBy:{ created_at:'desc' }, take:100, include:{ agent:true } }); return(<div className='grid gap-6'><div className='card'><div className='flex items-center justify-between'><h1 className='text-2xl font-semibold'>Listings Moderation</h1><a className='btn' href='/api/admin/logout'>Log out</a></div></div><div className='card overflow-x-auto'><table className='w-full text-sm'><thead><tr className='text-left text-gray-600'><th className='py-2'>Title</th><th>Agent</th><th>City</th><th>Status</th><th>Published</th><th></th></tr></thead><tbody>{listings.map(l=>(<tr key={l.id} className='border-t'><td className='py-2'>{l.title}</td><td>{l.agent?.full_name} ({l.agent?.verification})</td><td>{l.city}</td><td>{l.status}</td><td>{String(l.published)}</td><td className='space-x-2'><form action={`/api/admin/listings/moderate?action=publish&id=${l.id}`} method='POST' className='inline'><button className='btn'>Publish</button></form><form action={`/api/admin/listings/moderate?action=unpublish&id=${l.id}`} method='POST' className='inline'><button className='btn'>Unpublish</button></form></td></tr>))}</tbody></table></div></div>) }
+import { cookies } from 'next/headers';
+
+function isAuthorized() {
+  const jar = cookies();
+  const key = jar.get('admin_key')?.value;
+  const secret = process.env.ADMIN_SECRET;
+  return !!secret && key === secret;
+}
+
+export default async function AdminListingsPage() {
+  const ok = isAuthorized();
+
+  if (!ok) {
+    return (
+      <div className="card">
+        <h1 className="text-2xl font-semibold mb-2">Admin Access Required</h1>
+        <p className="text-gray-700">
+          Login via <code>/api/admin/login?key=YOUR_SECRET</code>
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="card">
+      <h1 className="text-2xl font-semibold mb-2">Listings Moderation</h1>
+      <p className="text-gray-700">
+        The detailed listings table is temporarily disabled while we finish the
+        database setup. The public site and agent tools can still work
+        normally.
+      </p>
+    </div>
+  );
+}
