@@ -1,3 +1,3 @@
 import { NextResponse } from 'next/server'
-import { prisma } from '@/lib/db'
+const db = prisma as any
 export async function POST(req:Request){ try{ const body=await req.json(); if(!body.saved_search_id) return NextResponse.json({error:'missing_saved_search_id'},{status:400}); const data:any={}; if(body.email) data.buyer_email=body.email; if(body.pushSubscription) data.buyer_push_json=body.pushSubscription; if(body.notification_pref) data.notification_pref=body.notification_pref; await prisma.savedSearch.update({ where:{ id: body.saved_search_id }, data }); return NextResponse.json({ok:true}) }catch(e:any){ console.error(e); return NextResponse.json({error:'server_error',detail:e.message},{status:500}) } }
