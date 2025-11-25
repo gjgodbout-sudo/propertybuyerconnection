@@ -17,12 +17,12 @@ const founderEnd = process.env.FOUNDER_END_UTC
 const founderToken = process.env.FOUNDER_TOKEN
 const tokenHeader = req.headers.get('x-founder-token') || ''
 
-let tier: PriceTier = PriceTier.TIER_200 // default
+let tier = 'TIER_200' as any // default
 const isWithinWindow = founderEnd ? Date.now() < Date.parse(founderEnd) : false
 const isAuthorizedToken = founderToken && tokenHeader === founderToken
 
 if (isWithinWindow || isAuthorizedToken) {
-  tier = PriceTier.TIER_50
+  tier = 'TIER_50' as any
 }
 const listing=await prisma.listing.create({ data:{
       agent_id,title:body.title,description:body.description||null,price:body.price?String(body.price):null,currency:body.currency||null,property_type:body.property_type||'house',beds:body.beds?Number(body.beds):null,baths:body.baths?Number(body.baths):null,building_size_sqft:body.building_size_sqft?Number(body.building_size_sqft):null,lot_size_sqft:body.lot_size_sqft?Number(body.lot_size_sqft):null,status:body.status||'for_sale',listing_url:body.listing_url,address_line1:body.address_line1||null,address_line2:body.address_line2||null,city:body.city||null,state_province:body.state_province||null,postal_zip:body.postal_zip||null,country:body.country||'US',lat:lat as any,lng:lng as any,published:(agent?.verification==='approved')?!!body.published:false,published_at: (agent?.verification==='approved'&&body.published)?new Date():null
