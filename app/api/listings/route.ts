@@ -24,7 +24,7 @@ const isAuthorizedToken = founderToken && tokenHeader === founderToken
 if (isWithinWindow || isAuthorizedToken) {
   tier = 'TIER_50' as any
 }
-const listing=await prisma.listing.create({ data:{
+const listing=await db.listing.create({ data:{
       agent_id,title:body.title,description:body.description||null,price:body.price?String(body.price):null,currency:body.currency||null,property_type:body.property_type||'house',beds:body.beds?Number(body.beds):null,baths:body.baths?Number(body.baths):null,building_size_sqft:body.building_size_sqft?Number(body.building_size_sqft):null,lot_size_sqft:body.lot_size_sqft?Number(body.lot_size_sqft):null,status:body.status||'for_sale',listing_url:body.listing_url,address_line1:body.address_line1||null,address_line2:body.address_line2||null,city:body.city||null,state_province:body.state_province||null,postal_zip:body.postal_zip||null,country:body.country||'US',lat:lat as any,lng:lng as any,published:(agent?.verification==='approved')?!!body.published:false,published_at: (agent?.verification==='approved'&&body.published)?new Date():null
     } })
     try{ if(listing.published){ fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/jobs/notify-new-listing`,{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ listing_id: listing.id }) }).catch(()=>{}) } }catch{}
