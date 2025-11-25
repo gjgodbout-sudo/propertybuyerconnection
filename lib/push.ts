@@ -1,21 +1,28 @@
 // lib/push.ts
+import webPush from 'web-push';
 
-/**
- * TEMPORARY STUB
- * ---------------
- * Real implementation used `web-push` for browser notifications.
- * For now we just log and do nothing.
- */
+const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+const VAPID_PRIVATE_KEY = process.env.VAPID_PRIVATE_KEY;
+const VAPID_SUBJECT =
+  process.env.VAPID_SUBJECT || 'mailto:admin@propertybuyerconnection.com';
 
-export type NewListingPushPayload = {
-  title?: string;
-  body?: string;
-  [key: string]: any;
-};
+// Only configure if keys exist (so the build doesn’t crash if they’re missing)
+if (VAPID_PUBLIC_KEY && VAPID_PRIVATE_KEY) {
+  webPush.setVapidDetails(VAPID_SUBJECT, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY);
+}
 
-export async function sendNewListingPush(
-  payload: NewListingPushPayload
-): Promise<void> {
-  console.log("sendNewListingPush stub called with payload:", payload);
-  // No push notification in this stub.
+// Type alias so TypeScript knows what a subscription looks like
+export type PushSubscription = webPush.PushSubscription;
+
+// 👇 THIS is the important part: a *named* export called sendPush
+export async function sendPush(
+  subscription: PushSubscription,
+  payload: unknown
+) {
+  if (!VAPID_PUBLIC_KEY || !VAPID_PRIVATE_KEY) {
+    console.warn('VAPID keys are not configured; skipping push notification.');
+    return;
+  }
+
+  await webPush.sendNotification(subscription, JSON.stringify(payload));
 }
