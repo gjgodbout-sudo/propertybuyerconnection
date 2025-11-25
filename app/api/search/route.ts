@@ -5,7 +5,7 @@ export async function GET(req:Request){
   try{
     if(lat&&lng){
       const db = prisma as any
-      const items=await db.$queryRawUnsafe<any[]>(`SELECT l.*, ST_Distance(l.location, ST_SetSRID(ST_MakePoint($1,$2),4326)::geography) AS distance_m FROM listings l WHERE l.published = true AND ST_DWithin(l.location, ST_SetSRID(ST_MakePoint($1,$2),4326)::geography, ($3 * 1000.0)) ORDER BY distance_m ASC, l.created_at DESC LIMIT $4 OFFSET $5`, Number(lng), Number(lat), radius_km, limit, offset); return NextResponse.json({items})
+      const items=await db.$queryRawUnsafe(`SELECT l.*, ST_Distance(l.location, ST_SetSRID(ST_MakePoint($1,$2),4326)::geography) AS distance_m FROM listings l WHERE l.published = true AND ST_DWithin(l.location, ST_SetSRID(ST_MakePoint($1,$2),4326)::geography, ($3 * 1000.0)) ORDER BY distance_m ASC, l.created_at DESC LIMIT $4 OFFSET $5`, Number(lng), Number(lat), radius_km, limit, offset); return NextResponse.json({items})
     } else {
       const items=await db.listing.findMany({ where:{ published:true, ...(city?{city:{contains:city,mode:'insensitive'}}:{}), ...(postal?{postal_zip:{contains:postal,mode:'insensitive'}}:{}) }, orderBy:[{created_at:'desc'},{price:'asc'}], take:limit, skip:offset })
       return NextResponse.json({items})
