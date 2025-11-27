@@ -1,28 +1,15 @@
 // lib/push.ts
-import webPush from 'web-push';
+// Temporary no-op push notifications implementation.
+// This keeps the API surface used by the rest of the app
+// without requiring web-push or complex typings.
 
-const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
-const VAPID_PRIVATE_KEY = process.env.VAPID_PRIVATE_KEY;
-const VAPID_SUBJECT =
-  process.env.VAPID_SUBJECT || 'mailto:admin@propertybuyerconnection.com';
+export type PushSubscription = any
 
-// Only configure if keys exist (so the build doesn’t crash if they’re missing)
-if (VAPID_PUBLIC_KEY && VAPID_PRIVATE_KEY) {
-  webPush.setVapidDetails(VAPID_SUBJECT, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY);
-}
-
-// Type alias so TypeScript knows what a subscription looks like
-export type PushSubscription = webPush.PushSubscription;
-
-// 👇 THIS is the important part: a *named* export called sendPush
 export async function sendPush(
-  subscription: PushSubscription,
-  payload: unknown
+  _subscription: PushSubscription,
+  _payload: unknown
 ) {
-  if (!VAPID_PUBLIC_KEY || !VAPID_PRIVATE_KEY) {
-    console.warn('VAPID keys are not configured; skipping push notification.');
-    return;
-  }
-
-  await webPush.sendNotification(subscription, JSON.stringify(payload));
+  // Push notifications disabled / not configured in this build.
+  // This is intentionally a no-op to keep the server happy.
+  console.log('sendPush called but push notifications are disabled.')
 }
