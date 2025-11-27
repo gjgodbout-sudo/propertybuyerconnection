@@ -22,41 +22,46 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/founder`, lastModified: new Date() },
   ]
 
-  const db = prisma as any
+  try {
+    const db = prisma as any
 
-  const listings = await db.listing.findMany({
-    where: { published: true },
-    select: {
-      id: true,
-      title: true,
-      city: true,
-      state_province: true,
-      updated_at: true,
-    },
-    take: 10000,
-  })
-
-   const urls: MetadataRoute.Sitemap = listings
-    .filter((l: any) =>
-      listingQualityScore({
-        published: true,
-        title: l.title,
-        city: l.city,
-        state_province: l.state_province,
-        updated_at: l.updated_at,
-      }).indexable
-    )
-    .map((l: any) => {
-      const slug = slugify(
-        `${l.title || ''}-${l.city || ''}-${l.state_province || ''}`
-      )
-
-      return {
-        url: `${baseUrl}/listing/${slug}-${l.id}`,
-        lastModified: l.updated_at || new Date(),
-      }
+    const listings = await db.listing.findMany({
+      where: { published: true },
+      select: {
+        id: true,
+        title: true,
+        city: true,
+        state_province: true,
+        updated_at: true,
+      },
+      take: 10000,
     })
 
+    const urls: MetadataRoute.Sitemap = listings
+      .filter((l: any) =>
+        listingQualityScore({
+          published: true,
+          title: l.title,
+          city: l.city,
+          state_province: l.state_province,
+          updated_at: l.updated_at,
+        }).indexable
+      )
+      .map((l: any) => {
+        const slug = slugify(
+          `${l.title || ''}-${l.city || ''}-${l.state_province || ''}`
+        )
 
-  return [...staticPages, ...urls]
+        return {
+          url: `${baseUrl}/listing/${slug}-${l.id}`,
+          lastModified: l.updated_at || new Date(),
+        }
+      })
+
+    return [...staticPages, ...urls]
+  } catch (e) {
+    console.error('Error building sitemap', e)
+    // Fallback: at least return static pages so the build doesn’t fail
+    return staticPages
+  }
 }
