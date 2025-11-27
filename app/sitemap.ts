@@ -36,8 +36,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     take: 10000,
   })
 
-  const urls: MetadataRoute.Sitemap = listings
-    .filter(l =>
+   const urls: MetadataRoute.Sitemap = listings
+    .filter((l: any) =>
       listingQualityScore({
         published: true,
         title: l.title,
@@ -56,6 +56,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         lastModified: l.updated_at || new Date(),
       }
     })
+
 
   return [...staticPages, ...urls]
 }
