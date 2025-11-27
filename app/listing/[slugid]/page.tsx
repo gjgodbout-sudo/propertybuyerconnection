@@ -1,6 +1,4 @@
 import { prisma } from '@/lib/db'
-import { slugify } from '@/lib/slugify'
-import ListingCard from '@/components/ListingCard'
 import type { Metadata } from 'next'
 
 function parseId(slugid: string): string {
@@ -26,17 +24,12 @@ export async function generateMetadata({
     return { title: 'Listing not found' }
   }
 
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
-  const slug = slugify(
-    `${listing.title || ''}-${listing.city || ''}-${listing.state_province || ''}`
-  )
+  const title =
+    listing.title ||
+    `Listing in ${listing.city ?? ''} ${listing.state_province ?? ''}`.trim()
 
   return {
-    title: listing.title || 'Property listing',
-    openGraph: {
-      title: listing.title || 'Property listing',
-      url: `${baseUrl}/listing/${slug}-${listing.id}`,
-    },
+    title,
   }
 }
 
@@ -60,7 +53,41 @@ export default async function ListingPage({
   return (
     <div className="grid gap-6">
       <div className="card">
-        <ListingCard listing={listing} />
+        <h1 className="text-2xl font-semibold mb-2">
+          {listing.title || 'Property listing'}
+        </h1>
+        <p className="text-gray-600 mb-4">
+          {listing.city ?? ''} {listing.state_province ?? ''}{' '}
+          {listing.postal_zip ?? ''}
+        </p>
+        <p className="text-gray-700 mb-4">
+          {listing.description || 'No description provided.'}
+        </p>
+
+        <div className="space-y-1 text-sm text-gray-700">
+          <div>
+            <strong>Price:</strong>{' '}
+            {listing.price ? `${listing.price} ${listing.currency ?? ''}` : '—'}
+          </div>
+          <div>
+            <strong>Type:</strong> {listing.property_type || '—'}
+          </div>
+          <div>
+            <strong>Beds:</strong> {listing.beds ?? '—'}
+          </div>
+          <div>
+            <strong>Baths:</strong> {listing.baths ?? '—'}
+          </div>
+        </div>
+
+        <div className="mt-4 text-sm text-gray-600">
+          {listing.agent && (
+            <p>
+              <strong>Agent:</strong> {listing.agent.full_name} (
+              {listing.agent.email})
+            </p>
+          )}
+        </div>
       </div>
     </div>
   )
