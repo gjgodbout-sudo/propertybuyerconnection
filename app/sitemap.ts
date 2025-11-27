@@ -46,7 +46,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         updated_at: l.updated_at,
       }).indexable
     )
-    .map(l => {
+    .map((l: any) => {
       const slug = slugify(
         `${l.title || ''}-${l.city || ''}-${l.state_province || ''}`
       )
