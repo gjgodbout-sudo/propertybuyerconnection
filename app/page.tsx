@@ -1,25 +1,21 @@
-'use client'
-function slugify(s:string){return (s||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')}
-import { useState } from 'react'
-export default function HomePage(){
-  const [city,setCity]=useState(''); const [postal,setPostal]=useState(''); const [lat,setLat]=useState(''); const [lng,setLng]=useState('')
-  const [radius,setRadius]=useState(25); const [results,setResults]=useState<any[]>([])
-  async function search(){ const params=new URLSearchParams(); if(city) params.set('city',city); if(postal) params.set('postal',postal); if(lat&&lng){params.set('lat',lat);params.set('lng',lng);params.set('radius_km',String(radius))}; const res=await fetch('/api/search?'+params.toString(),{cache:'no-store'}); const data=await res.json(); setResults(data.items||[]) }
-  return(<div className='grid gap-6'>
-    <div className='card'>
-      <h1 className='text-2xl font-semibold mb-4'>Find Properties</h1>
-      <p className='text-sm text-gray-600 mb-3'>Prefer a map? Try our <a className='underline' href='/map'>Map Search</a>.</p>
-      <div className='grid sm:grid-cols-2 gap-4'>
-        <div><label className='label'>City</label><input className='input' value={city} onChange={e=>setCity(e.target.value)} placeholder='Ottawa, Nashville...'/></div>
-        <div><label className='label'>Postal/ZIP</label><input className='input' value={postal} onChange={e=>setPostal(e.target.value)} placeholder='K1P 1A4 or 37201'/></div>
-        <div><label className='label'>Latitude (optional)</label><input className='input' value={lat} onChange={e=>setLat(e.target.value)} placeholder='45.4215'/></div>
-        <div><label className='label'>Longitude (optional)</label><input className='input' value={lng} onChange={e=>setLng(e.target.value)} placeholder='-75.6972'/></div>
-        <div className='sm:col-span-2'><label className='label'>Radius (km)</label><input type='range' min={5} max={250} value={radius} onChange={e=>setRadius(parseInt(e.target.value))} className='w-full'/><div className='text-sm text-gray-600 mt-1'>{radius} km</div></div>
-        <div className='sm:col-span-2'><button className='btn-primary' onClick={search}>Search</button></div>
+export default function Home() {
+  return (
+    <main className="min-h-screen flex items-center justify-center bg-slate-50">
+      <div className="card max-w-xl mx-auto text-center">
+        <h1 className="text-3xl font-bold mb-3">
+          Property Buyer Connection
+        </h1>
+        <p className="text-gray-700 mb-4">
+          If you can see this page, the site is deployed correctly on Vercel.
+        </p>
+        <p className="text-gray-600 mb-6">
+          Next step: we’ll hook this up to the full app (founder page, agent
+          signup, listings, etc.).
+        </p>
+        <a href="/founder" className="btn">
+          Go to Founder Page
+        </a>
       </div>
-    </div>
-    <div className='grid gap-4'>{results.map((l)=> (<div key={l.id} className='card'><div className='flex items-center justify-between gap-4'><div><div className='font-semibold'>{l.title}</div><div className='text-sm text-gray-600'>{l.city}, {l.state_province} • {l.property_type} • Beds {l.beds ?? '-'} • Baths {l.baths ?? '-'}</div><div className='text-sm text-gray-600'>Price: {l.price ? `$${Number(l.price).toLocaleString()}` : '—'}</div></div><div className='flex gap-2'><a className='btn' href={l.listing_url} target='_blank' rel='noopener noreferrer'>View Full Listing</a><a className='btn' href={`/lead/${l.id}`}>Contact Agent</a><a className='btn' href={`/listing/${slugify(`${l.title||''}-${l.city||''}-${l.state_province||''}`)}-${l.id}`}>Details</a></div></div></div>))}</div>
-    <div className='card'><h2 className='text-lg font-semibold mb-2'>Save this search</h2><p className='text-sm text-gray-600 mb-3'>Enter email (optional) and/or enable push to get notified when new matches appear.</p><div className='grid sm:grid-cols-2 gap-3'><input id='save-email' className='input' placeholder='you@example.com' /><button id='btn-save' className='btn'>Save search</button><button id='btn-push' className='btn'>Enable browser push</button></div><p id='save-msg' className='text-sm mt-2'></p></div>
-    <script dangerouslySetInnerHTML={{__html:`(function(){let savedSearchId=null;async function save(){const email=(document.getElementById('save-email')).value;const body={filters_json:{},radius_km:${'${radius}'} };const city=${'${city}'};const postal=${'${postal}'};const lat=${'${lat}'};const lng=${'${lng}'};if(city) body.filters_json.city=city;if(postal) body.filters_json.postal=postal;if(lat&&lng){body.lat=lat;body.lng=lng;}if(email) body.buyer_email=email;const res=await fetch('/api/saved-searches',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const data=await res.json();if(!res.ok){document.getElementById('save-msg').textContent='Error saving search';return}savedSearchId=data.id;document.getElementById('save-msg').textContent='Saved. You can now enable push.'}async function push(){if(!savedSearchId){document.getElementById('save-msg').textContent='Save your search first.';return}const mod=await import('/pwa-inline.js').catch(()=>null);if(!mod){document.getElementById('save-msg').textContent='Push not available';return}const sub=await mod.subscribePush();if(!sub){document.getElementById('save-msg').textContent='Push permission declined or unsupported.';return}await fetch('/api/notifications/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({saved_search_id:savedSearchId,pushSubscription:sub})});document.getElementById('save-msg').textContent='Push enabled ✅'}setTimeout(()=>{document.getElementById('btn-save')?.addEventListener('click',save);document.getElementById('btn-push')?.addEventListener('click',push);},0)})()`}}/>
-  </div>)
+    </main>
+  );
 }
