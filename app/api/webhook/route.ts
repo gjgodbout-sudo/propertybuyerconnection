@@ -13,7 +13,13 @@ export async function POST(req: Request) {
   }
 
   const payload = await req.text();
-  let event: any;
+  const customerId = event?.data?.object?.customer;
+
+if (!customerId) {
+  console.warn('No customer ID found in event payload.');
+  return NextResponse.json({ received: true }); // prevents Stripe retries
+}
+let event: any;
 
   try {
     event = stripe.webhooks.constructEvent(payload, sig, secret);
@@ -45,6 +51,7 @@ if (
 
   // ... event handling logic continues here
 }
+
 
 
 
